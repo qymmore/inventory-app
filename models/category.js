@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 const Schema = mongoose.Schema;
 
-const CategoriesSchema = new Schema({
+const CategorySchema = new Schema({
     name: {
         type: String,
         required: true,
@@ -17,8 +17,8 @@ const CategoriesSchema = new Schema({
     },
 });
 
-CategoriesSchema.virtual('url').get(function() {
+CategorySchema.virtual('url').get(function() {
     return `/categories`;
 });
 
-module.exports = mongoose.model('Categories', CategoriesSchema);
+module.exports = mongoose.model('Category', CategorySchema);
