@@ -7,18 +7,10 @@ const CategorySchema = new Schema({
         type: String,
         required: true,
     },
-    description: {
-        type: String,
-        required: true,
-    },
-    URL: {
-        type: String,
-        required: true
-    },
 });
 
 CategorySchema.virtual('url').get(function() {
-    return `/categories`;
+    return `/category`;
 });
 
 module.exports = mongoose.model('Category', CategorySchema);
