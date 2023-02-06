@@ -1,0 +1,13 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each game in game_list
+      li
+        #{game.title}
+        |  (#{game.studio.name})
+
+    else
+      li There are no games.

@@ -1,0 +1,33 @@
+extends layout
+
+block content
+  h1 Title: #{game.title}
+
+  p #[strong Studio:]
+    #{game.studio.name}
+  p #[strong Summary:] #{game.summary}
+  p #[strong Genre:]
+    each val, index in game.genre
+      a(href=val.link) #{val.name}
+      if index < game.genre.length - 1
+        |,
+
+  div(style='margin-left:20px;margin-top:20px')
+    h4 Copies
+
+    each val in game_instances
+      hr
+      if val.status=='Available'
+        p.text-success #{val.status}
+      else if val.status=='Maintenance'
+        p.text-danger #{val.status}
+      else
+        p.text-warning #{val.status}
+      p #[strong Imprint:] #{val.imprint}
+      if val.status!='Available'
+        p Game is not available
+      p #[strong Id:]
+        a(href=val.link) #{val._id}
+
+    else
+      p There are no copies of this game in the inventory.

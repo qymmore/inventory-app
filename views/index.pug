@@ -1,11 +1,20 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title><%= title %></title>
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-  </head>
-  <body>
-    <h1><%= title %></h1>
-    <p>Welcome to <%= title %></p>
-  </body>
-</html>
+extends layout
+
+block content
+  h1= title
+  hr
+  p Welcome to the Video Game Inventory Management app, a simple app for keeping track of all video games available in your store.
+
+  h2 Inventory Stats
+
+  if error
+    p Error getting dynamic content.
+  else
+    p Your inventory currently has the following record counts:
+
+    ul
+      li #[strong Games:] !{data.game_count}
+      li #[strong Copies:] !{data.game_instance_count}
+      li #[strong Copies available:] !{data.game_instance_available_count}
+      li #[strong Studios:] !{data.studio_count}
+      li #[strong Genres:] !{data.genre_count}

@@ -1,0 +1,19 @@
+extends layout
+
+block content
+
+  h1 Studio: #{studio.name}
+  p #{studio.location}
+
+  div(style='margin-left:20px;margin-top:20px')
+
+    h4 Games
+
+    dl
+      each game in studio_games
+        dt
+          #{game.title}
+        dd #{game.summary}
+
+      else
+        p This studio has no games.

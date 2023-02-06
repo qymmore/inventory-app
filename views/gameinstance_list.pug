@@ -1,0 +1,20 @@
+extends layout
+
+block content
+  h1= title
+
+  ul
+    each val in gameinstance_list
+      li
+        #{val.game.title} : #{val.release_date} -
+        if val.status=='Available'
+          span.text-success #{val.status}
+        else if val.status=='Maintenance'
+          span.text-danger #{val.status}
+        else
+          span.text-warning #{val.status}
+        if val.status!='Available'
+          span  Game unavailable
+
+    else
+      li There are no game copies in this inventory.
