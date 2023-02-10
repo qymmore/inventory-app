@@ -5,16 +5,21 @@ block content
 
   ul
     each val in gameinstance_list
-      li
-        #{val.game.title} : #{val.release_date} -
+      li 
+        a(href=val.url) #{val.game.title} : #{val.release_date_formatted} -
         if val.status=='Available'
           span.text-success #{val.status}
         else if val.status=='Maintenance'
           span.text-danger #{val.status}
         else
           span.text-warning #{val.status}
-        if val.status!='Available'
+        if val.status!='Available' 
           span  Game unavailable
+        ul
+          li Console(s): #{val.console}
+          li Price: $#{val.price}
+          li Number in stock: #{val.inStock}
+      hr
 
     else
       li There are no game copies in this inventory.

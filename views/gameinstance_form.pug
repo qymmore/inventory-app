@@ -1,0 +1,43 @@
+extends layout
+
+block content
+  h1=title
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='game') Game:
+      select#game.form-control(type='select' placeholder='Select game' name='game' required='true')
+        - game_list.sort(function(a, b) {let textA = a.title.toUpperCase(); let textB = b.title.toUpperCase(); return (textA < textB) ? -1 : (textA > textB) ? 1 : 0;});
+        for game in game_list
+          option(value=game._id, selected=(selected_game==game._id.toString() ? 'selected' : false) ) #{game.title}
+
+    div.form-group
+      label(for='release_date') Date when game was released:
+      input#release_date.form-control(type='date' name='release_date' value=(undefined===gameinstance ? '' : gameinstance.release_date))
+
+    div.form-group
+      label(for='status') Status:
+      select#status.form-control(type='select' placeholder='Select status' name='status' required='true')
+        option(value='Maintenance') Maintenance
+        option(value='Available') Available
+        option(value='Loaned') Loaned
+        option(value='Reserved') Reserved
+
+    div.form-group
+      label(for='console') Console:
+      input#console.form-control(type='text', placeholder='PS5, XBox, Nintendo Switch, etc' name='console' value=(undefined===gameinstance ? '' : gameinstance.console))
+
+    div.form-group
+      label(for='price') Price:
+      input#price.form-control(type='number', placeholder='Enter price here' name='price' value=(undefined===gameinstance ? '' : gameinstance.price))
+
+    div.form-group
+      label(for='inStock') Number in stock:
+      input#inStock.form-control(type='number', name='inStock' value=(undefined===gameinstance ? '' : gameinstance.inStock))
+
+    button.btn.btn-primary(type='submit') Submit
+
+  if errors
+    ul
+      for error in errors
+        li!= error.msg

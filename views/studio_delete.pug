@@ -1,0 +1,28 @@
+extends layout
+
+block content
+  h1 #{title}: #{studio.name}
+  p= studio.location
+
+  if studio_games.length
+
+    p #[strong Delete the following games before attempting to delete this studio.]
+
+    div(style='margin-left:20px;margin-top:20px')
+
+      h4 Games
+
+      dl
+      each game in studio_games
+        dt 
+          a(href=game.url) #{game.title}
+        dd #{game.summary}
+
+  else
+    p Do you really want to delete this Studio?
+
+    form(method='POST' action='')
+      div.form-group
+        input#studioid.form-control(type='hidden',name='studioid', required='true', value=studio._id )
+
+      button.btn.btn-primary(type='submit') Delete

@@ -5,9 +5,11 @@ block content
 
   ul
     each game in game_list
-      li
-        #{game.title}
+      li 
+        a(href=game.url) #{game.title}
         |  (#{game.studio.name})
 
+      hr
+          
     else
       li There are no games.

@@ -11,7 +11,7 @@ block content
     dl
       each game in genre_games
         dt
-          #{game.title}
+          a(href=game.url) #{game.title}
         dd #{game.summary}
 
       else

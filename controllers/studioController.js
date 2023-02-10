@@ -1,7 +1,7 @@
 const Studio = require("../models/studio");
 const async = require("async");
 const Game = require("../models/game");
-
+const { body, validationResult } = require("express-validator");
 
 // Display list of all Studios.
 exports.studio_list = function (req, res, next) {
@@ -53,24 +53,119 @@ exports.studio_detail = (req, res, next) => {
 
 
 // Display Studio create form on GET.
-exports.studio_create_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio create GET");
+exports.studio_create_get = (req, res, next) => {
+  res.render("studio_form", { title: "Create Studio" });
 };
 
 // Handle Studio create on POST.
-exports.studio_create_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio create POST");
-};
+exports.studio_create_post = [
+  // Validate and sanitize fields.
+  body("name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("location")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    //Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render form again with sanitized values/errors messages.
+      res.render("studio_form", {
+        title: "Create Studio",
+        studio: req.body,
+        location: req.body,
+        errors: errors.array(),
+      });
+      return;
+    }
+    // Data from form is valid.
+
+    // Create an Studio object with escaped and trimmed data.
+    const studio = new Studio({
+      name: req.body.name,
+      location: req.body.location,
+    });
+    studio.save((err) => {
+      if (err) {
+        return next(err);
+      }
+      // Successful - redirect to new studio record.
+      res.redirect(studio.url);
+    });
+  },
+];
 
 // Display Studio delete form on GET.
-exports.studio_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio delete GET");
+exports.studio_delete_get = (req, res, next) => {
+  async.parallel(
+    {
+      studio(callback) {
+        Studio.findById(req.params.id).exec(callback);
+      },
+      studios_games(callback) {
+        Game.find({ studio: req.params.id }).exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      if (results.studio == null) {
+        // No results.
+        res.redirect("/catalog/studios");
+      }
+      // Successful, so render.
+      res.render("studio_delete", {
+        title: "Delete Studio",
+        studio: results.studio,
+        studio_games: results.studios_games,
+      });
+    }
+  );
 };
 
 // Handle Studio delete on POST.
-exports.studio_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio delete POST");
+exports.studio_delete_post = (req, res, next) => {
+  async.parallel(
+    {
+      studio(callback) {
+        Studio.findById(req.body.studioid).exec(callback);
+      },
+      studios_games(callback) {
+        Game.find({ studio: req.body.studioid }).exec(callback);
+      },
+    },
+    (err, results) => {
+      if (err) {
+        return next(err);
+      }
+      // Success
+      if (results.studios_games.length > 0) {
+        // Studio has games. Render in same way as for GET route.
+        res.render("studio_delete", {
+          title: "Delete Studio",
+          studio: results.studio,
+          studio_games: results.studios_games,
+        });
+        return;
+      }
+      // Studio has no games. Delete object and redirect to the list of studios.
+      Studio.findByIdAndRemove(req.body.studioid, (err) => {
+        if (err) {
+          return next(err);
+        }
+        // Success - go to studio list
+        res.redirect("/catalog/studios");
+      });
+    }
+  );
 };
+
 
 // Display Studio update form on GET.
 exports.studio_update_get = (req, res) => {

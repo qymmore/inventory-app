@@ -5,9 +5,8 @@ block content
 
   ul
     each studio in studio_list
-      li
-        #{studio.name}
-        |  (#{studio.location})
+      li 
+        a(href=studio.url) #{studio.name} - #{studio.location}
 
     else
       li There are no studios.

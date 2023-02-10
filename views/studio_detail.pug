@@ -12,8 +12,14 @@ block content
     dl
       each game in studio_games
         dt
-          #{game.title}
+          a(href=game.url) #{game.title}
         dd #{game.summary}
 
       else
         p This studio has no games.
+
+  
+  hr
+  p
+    a(href=studio.url+'/delete') Delete studio
+

@@ -4,10 +4,9 @@ block content
 
   h1 ID: #{gameinstance._id}
 
-  p #[strong Title:]
-    #{gameinstance.game.title}
+  p #[strong Title:] #{gameinstance.game.title}
 
-  p #[strong Status:]
+  p #[strong Status: ]
     if gameinstance.status=='Available'
       span.text-success #{gameinstance.status}
     else if gameinstance.status=='Maintenance'

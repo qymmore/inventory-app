@@ -1,0 +1,17 @@
+extends layout
+
+block content
+  h1=title
+
+  form(method='POST' action='')
+    div.form-group
+      label(for='name') Name:
+      input#name.form-control(type='text' placeholder='e.g. Santa Monica Studios' name='name' required='true' value=(undefined===studio ? '' : studio.name))
+    div.form-group
+      label(for='location') Location (City, Country):
+      input#location.form-control(type='text' name='location' placeholder='e.g. California, USA' required='true' value=(undefined===studio ? '' : studio.location) )
+    button.btn.btn-primary(type='submit') Submit
+  if errors
+    ul
+      for error in errors
+        li!= error.msg
