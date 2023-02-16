@@ -200,13 +200,78 @@ exports.game_create_post = [
 
 
 // Display game delete form on GET.
-exports.game_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Game delete GET");
+exports.game_delete_get = function (req, res, next) {
+  async.parallel(
+    {
+      game: function (callback) {
+        Game.findById(req.params.id)
+          .populate("studio")
+          .populate("genre")
+          .exec(callback);
+      },
+      game_gameinstances: function (callback) {
+        GameInstance.find({ game: req.params.id }).exec(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      if (results.game == null) {
+        // No results.
+        res.redirect("/catalog/games");
+      }
+      // Successful, so render.
+      res.render("game_delete", {
+        title: "Delete Game",
+        game: results.game,
+        game_instances: results.game_gameinstances,
+      });
+    }
+  );
 };
 
 // Handle game delete on POST.
-exports.game_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Game delete POST");
+exports.game_delete_post = function (req, res, next) {
+  // Assume the post has valid id (ie no validation/sanitization).
+
+  async.parallel(
+    {
+      game: function (callback) {
+        Game.findById(req.body.id)
+          .populate("studio")
+          .populate("genre")
+          .exec(callback);
+      },
+      game_gameinstances: function (callback) {
+        GameInstance.find({ game: req.body.id }).exec(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      // Success
+      if (results.game_gameinstances.length > 0) {
+        // Game has game_instances. Render in same way as for GET route.
+        res.render("game_delete", {
+          title: "Delete Game",
+          game: results.game,
+          game_instances: results.game_gameinstances,
+        });
+        return;
+      } else {
+        // Book has no BookInstance objects. Delete object and redirect to the list of books.
+        Game.findByIdAndRemove(req.body.id, function deleteGame(err) {
+          if (err) {
+            return next(err);
+          }
+          // Success - got to books list.
+          res.redirect("/catalog/games");
+        });
+      }
+    }
+  );
 };
 
 // Display game update form on GET.

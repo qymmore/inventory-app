@@ -11,16 +11,14 @@ A game inventory management app created using Express and Node.js that helps cli
 # Specifications
 The inventory app shows clients:
 
-- Total number of games in their inventory (**Games**)
-- Total number of game instances/copies of the game (**Copies available**)
-- Total number of game studios (**Studio**)
-- All genres of games (**Genres**)
+- Game titles in their inventory (**Games**)
+- Copies of available games (**Copies available**)
+- Game studios/developers (**Studio**)
+- All genres (**Genres**)
 
 Clients can perform the following actions:
 
-- **Add** a new game, game instance, studio or genre
-- **Delete** a game, game instance, studio or genre
-- **Update** a game, game instance, studio or genre
+- **Add/Delete/Update** a new game, game instance, studio or genre
 
 # How to run the app
 

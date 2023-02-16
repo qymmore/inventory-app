@@ -168,11 +168,68 @@ exports.studio_delete_post = (req, res, next) => {
 
 
 // Display Studio update form on GET.
-exports.studio_update_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio update GET");
+exports.studio_update_get = function (req, res, next) {
+  Studio.findById(req.params.id, function (err, studio) {
+    if (err) {
+      return next(err);
+    }
+    if (studio == null) {
+      // No results.
+      var err = new Error("Studio not found");
+      err.status = 404;
+      return next(err);
+    }
+    // Success.
+    res.render("studio_form", { title: "Update Studio", studio: studio });
+  });
 };
 
 // Handle Studio update on POST.
-exports.studio_update_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: Studio update POST");
-};
+exports.studio_update_post = [
+  // Validate and santize fields.
+  body("name")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+  body("location")
+    .trim()
+    .isLength({ min: 1 })
+    .escape(),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create Author object with escaped and trimmed data (and the old id!)
+    var studio = new Studio({
+      name: req.body.name,
+      location: req.body.location,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors. Render the form again with sanitized values and error messages.
+      res.render("studio_form", {
+        title: "Update Studio",
+        studio: studio,
+        errors: errors.array(),
+      });
+      return;
+    } else {
+      // Data from form is valid. Update the record.
+      Studio.findByIdAndUpdate(
+        req.params.id,
+        studio,
+        {},
+        function (err, thestudio) {
+          if (err) {
+            return next(err);
+          }
+          // Successful - redirect to studio detail page.
+          res.redirect(thestudio.url);
+        }
+      );
+    }
+  },
+];

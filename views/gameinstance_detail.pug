@@ -16,3 +16,9 @@ block content
 
   if gameinstance.status!='Available'
     p This game is not available.
+
+  hr
+  p
+    a(href=gameinstance.url+'/delete') Delete GameInstance
+  p
+    a(href=gameinstance.url+'/update') Update GameInstance

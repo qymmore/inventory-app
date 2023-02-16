@@ -1,0 +1,31 @@
+extends layout
+
+block content
+
+  h1= title
+  
+  p #[strong Do you really want to delete this GameInstance?]
+  
+  div(style="margin-left:20px")
+
+    p #[strong ID]: #{gameinstance._id}
+  
+    p #[strong Title:] 
+      a(href=gameinstance.game.url) #{gameinstance.game.title}
+
+    p #[strong Status:] 
+      if gameinstance.status=='Available'
+        span.text-success #{gameinstance.status}
+      else if gameinstance.status=='Maintenance'
+        span.text-danger #{gameinstance.status}
+      else
+        span.text-warning #{gameinstance.status} 
+      
+    if gameinstance.status!='Available'
+      p This game is not available.
+
+  form(method='POST' action='')
+    div.form-group
+      input#id.form-control(type='hidden',name='id', required='true', value=gameinstance._id )
+
+    button.btn.btn-primary(type='submit') Delete

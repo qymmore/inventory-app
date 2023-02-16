@@ -1,6 +1,7 @@
 const GameInstance = require("../models/gameinstance");
 const Game = require("../models/game");
 const { body, validationResult } = require("express-validator");
+const async = require('async');
 
 // Display list of all GameInstances.
 exports.gameinstance_list = function (req, res, next) {
@@ -35,7 +36,7 @@ exports.gameinstance_detail = (req, res, next) => {
       // Successful, so render.
       res.render("gameinstance_detail", {
         title: `Copy: ${gameinstance.game.title}`,
-        gameinstance,
+        gameinstance: gameinstance,
       });
     });
 };
@@ -97,7 +98,7 @@ exports.gameinstance_create_post = [
         });
       });
       return;
-    }
+    } 
 
     // Data from form is valid.
     gameinstance.save((err) => {
@@ -112,21 +113,121 @@ exports.gameinstance_create_post = [
 
 
 // Display GameInstance delete form on GET.
-exports.gameinstance_delete_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: GameInstance delete GET");
+exports.gameinstance_delete_get = function (req, res, next) {
+  GameInstance.findById(req.params.id)
+    .populate("game")
+    .exec(function (err, gameinstance) {
+      if (err) {
+        return next(err);
+      }
+      if (gameinstance == null) {
+        // No results.
+        res.redirect("/catalog/gameinstances");
+      }
+      // Successful, so render.
+      res.render("gameinstance_delete", {
+        title: "Delete GameInstance",
+        gameinstance: gameinstance,
+      });
+    });
 };
 
+
 // Handle GameInstance delete on POST.
-exports.gameinstance_delete_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: GameInstance delete POST");
+exports.gameinstance_delete_post = function (req, res, next) {
+  // Assume valid GameInstance id in field.
+  GameInstance.findByIdAndRemove(req.body.id, function deleteGameInstance(err) {
+    if (err) {
+      return next(err);
+    }
+    // Success, so redirect to list of GameInstance items.
+    res.redirect("/catalog/gameinstances");
+  });
 };
 
 // Display GameInstance update form on GET.
-exports.gameinstance_update_get = (req, res) => {
-  res.send("NOT IMPLEMENTED: GameInstance update GET");
+exports.gameinstance_update_get = function (req, res, next) {
+  // Get game, studios and genres for form.
+  async.parallel(
+    {
+      gameinstance: function (callback) {
+        GameInstance.findById(req.params.id).populate("game").exec(callback);
+      },
+      games: function (callback) {
+        Game.find(callback);
+      },
+    },
+    function (err, results) {
+      if (err) {
+        return next(err);
+      }
+      if (results.gameinstance == null) {
+        // No results.
+        var err = new Error("Game copy not found");
+        err.status = 404;
+        return next(err);
+      }
+      // Success.
+      res.render("gameinstance_form", {
+        title: "Update GameInstance",
+        game_list: results.games,
+        selected_game: results.gameinstance.game._id,
+        gameinstance: results.gameinstance,
+      });
+    }
+  );
 };
 
 // Handle gameinstance update on POST.
-exports.gameinstance_update_post = (req, res) => {
-  res.send("NOT IMPLEMENTED: GameInstance update POST");
-};
+exports.gameinstance_update_post = [
+  // Validate and sanitize fields.
+  body("game", "Game must be specified").trim().isLength({ min: 1 }).escape(),
+  body("status").escape(),
+  body("release_date", "Invalid date").optional({ checkFalsy: true }),
+
+  // Process request after validation and sanitization.
+  (req, res, next) => {
+    // Extract the validation errors from a request.
+    const errors = validationResult(req);
+
+    // Create a BookInstance object with escaped/trimmed data and current id.
+    var gameinstance = new GameInstance({
+      game: req.body.game,
+      status: req.body.status,
+      release_date: req.body.release_date,
+      _id: req.params.id,
+    });
+
+    if (!errors.isEmpty()) {
+      // There are errors so render the form again, passing sanitized values and errors.
+      Game.find({}, "title").exec(function (err, games) {
+        if (err) {
+          return next(err);
+        }
+        // Successful, so render.
+        res.render("gameinstance_form", {
+          title: "Update GameInstance",
+          game_list: games,
+          selected_game: gameinstance.game._id,
+          errors: errors.array(),
+          gameinstance: gameinstance,
+        });
+      });
+      return;
+    } else {
+      // Data from form is valid.
+      GameInstance.findByIdAndUpdate(
+        req.params.id,
+        gameinstance,
+        {},
+        function (err, thegameinstance) {
+          if (err) {
+            return next(err);
+          }
+          // Successful - redirect to detail page.
+          res.redirect(thegameinstance.url);
+        }
+      );
+    }
+  },
+];
