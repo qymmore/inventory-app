@@ -92,8 +92,7 @@ router.get("/genres", genre_controller.genre_list);
 
 // GET request for creating a GameInstance. NOTE This must come before route that displays GameInstance (uses id).
 router.get(
-  "/gameinstance/create",
-  game_instance_controller.gameinstance_create_get
+  "/gameinstance/create", game_instance_controller.gameinstance_create_get
 );
 
 // POST request for creating GameInstance.

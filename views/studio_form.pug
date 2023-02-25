@@ -10,6 +10,11 @@ block content
     div.form-group
       label(for='location') Location (City, Country):
       input#location.form-control(type='text' name='location' placeholder='e.g. California, USA' required='true' value=(undefined===studio ? '' : studio.location) )
+
+      label(for='password') Enter admin password 
+      br
+      input(name='password' type='text' required=true)
+      br
     button.btn.btn-primary(type='submit') Submit
   if errors
     ul

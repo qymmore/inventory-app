@@ -23,6 +23,9 @@ block content
     
     form(method='POST' action='')
       div.form-group
+        label(for='password') Enter admin password
+        br
+        input(name='password' type='text' required=true)
         input#id.form-control(type='hidden',name='id', required='true', value=genre._id )
 
       button.btn.btn-primary(type='submit') Delete

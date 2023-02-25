@@ -90,13 +90,17 @@ exports.genre_create_post = [
           // Genre exists, redirect to its detail page.
           res.redirect(found_genre.url);
         } else {
-          genre.save((err) => {
-            if (err) {
-              return next(err);
-            }
-            // Genre saved. Redirect to genre detail page.
-            res.redirect(genre.url);
-          });
+          if(req.body.password == process.env.SECRET_PASS){
+            genre.save((err) => {
+              if (err) {
+                return next(err);
+              }
+              // Genre saved. Redirect to genre detail page.
+              res.redirect(genre.url);
+            });
+          } else {
+            res.send('Access denied');
+          }
         }
       });
     }
@@ -150,7 +154,7 @@ exports.genre_delete_post = function (req, res, next) {
       }
       // Success
       if (results.genre_games.length > 0) {
-        // Genre has books. Render in same way as for GET route.
+        // Genre has games. Render in same way as for GET route.
         res.render("genre_delete", {
           title: "Delete Genre",
           genre: results.genre,
@@ -158,14 +162,18 @@ exports.genre_delete_post = function (req, res, next) {
         });
         return;
       } else {
-        // Genre has no books. Delete object and redirect to the list of genres.
-        Genre.findByIdAndRemove(req.body.id, function deleteGenre(err) {
-          if (err) {
-            return next(err);
-          }
+        // Genre has no games. Delete object and redirect to the list of genres.
+        if(req.body.password == process.env.SECRET_PASS){
+          Genre.findByIdAndRemove(req.body.id, function deleteGenre(err) {
+            if (err) {
+              return next(err);
+            }
           // Success - go to genres list.
-          res.redirect("/catalog/genres");
-        });
+            res.redirect("/catalog/genres");
+        }) 
+        } else {
+          res.send('Access denied');
+        }
       }
     }
   );
@@ -217,18 +225,22 @@ exports.genre_update_post = [
       return;
     } else {
       // Data from form is valid. Update the record.
-      Genre.findByIdAndUpdate(
-        req.params.id,
-        genre,
-        {},
-        function (err, thegenre) {
-          if (err) {
-            return next(err);
+      if(req.body.password == process.env.SECRET_PASS){
+        Genre.findByIdAndUpdate(
+          req.params.id,
+          genre,
+          {},
+          function (err, thegenre) {
+            if (err) {
+              return next(err);
+            }
+            // Successful - redirect to genre detail page.
+            res.redirect(thegenre.url);
           }
-          // Successful - redirect to genre detail page.
-          res.redirect(thegenre.url);
-        }
-      );
+        ); 
+      } else {
+        res.send('Access denied');
+      }
     }
   },
 ];

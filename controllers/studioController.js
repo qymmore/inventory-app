@@ -154,7 +154,8 @@ exports.studio_delete_post = (req, res, next) => {
         });
         return;
       }
-      // Studio has no games. Delete object and redirect to the list of studios.
+      if(req.body.password == process.env.SECRET_PASS){
+        // Studio has no games. Delete object and redirect to the list of studios.
       Studio.findByIdAndRemove(req.body.studioid, (err) => {
         if (err) {
           return next(err);
@@ -162,6 +163,9 @@ exports.studio_delete_post = (req, res, next) => {
         // Success - go to studio list
         res.redirect("/catalog/studios");
       });
+      } else {
+        res.send('Access denied');
+      }
     }
   );
 };
@@ -201,7 +205,7 @@ exports.studio_update_post = [
     // Extract the validation errors from a request.
     const errors = validationResult(req);
 
-    // Create Author object with escaped and trimmed data (and the old id!)
+    // Create Studio object with escaped and trimmed data (and the old id!)
     var studio = new Studio({
       name: req.body.name,
       location: req.body.location,
@@ -218,18 +222,22 @@ exports.studio_update_post = [
       return;
     } else {
       // Data from form is valid. Update the record.
-      Studio.findByIdAndUpdate(
-        req.params.id,
-        studio,
-        {},
-        function (err, thestudio) {
-          if (err) {
-            return next(err);
+      if(req.body.password == process.env.SECRET_PASS){
+        Studio.findByIdAndUpdate(
+          req.params.id,
+          studio,
+          {},
+          function (err, thestudio) {
+            if (err) {
+              return next(err);
+            }
+            // Successful - redirect to studio detail page.
+            res.redirect(thestudio.url);
           }
-          // Successful - redirect to studio detail page.
-          res.redirect(thestudio.url);
-        }
-      );
+        );
+      } else {
+        res.send('Access denied');
+      }
     }
   },
 ];

@@ -1,44 +1,50 @@
 # Game Inventory App
 
-A game inventory management app created using Express and Node.js that helps clients who are video game store owners keep track of video games in their stock. 
+This is a CRUD (Create, Read, Update, Delete) web application for managing a game inventory. The app is built using Node.js and Express.js, and allows users to add new games, studios, genres, and game instances.
 
-# Tech stack
+![index-page](./public/images/index.png)
+
+# Technologies
  - Express.js (API and routing)
  - Node.js (Server-side hosting and function)
  - MongoDB (Database)
  - Pug (User interface and styling)
 
-# Specifications
-The inventory app shows clients:
+# Features
+The inventory app shows:
 
 - Game titles in their inventory (**Games**)
 - Copies of available games (**Copies available**)
 - Game studios/developers (**Studio**)
 - All genres (**Genres**)
+- Specific routes can only be accessed with a secret password: `adminiscool`
 
-Clients can perform the following actions:
-
-- **Add/Delete/Update** a new game, game instance, studio or genre
-
-# How to run the app
-
+![gamelist](./public/images/gamelist.png)
+![studio](./public/images/create-studio.png)
+# Getting Started
 1. Clone the directory
 2. Open the directory in your favorite code editor
 3. Run ```DEBUG=inventory-app:* npm run devstart``` in the terminal
 4. Go to `localhost:3000/catalog`
 
-# Routes in the app
+To get started with the app, follow these steps:
 
-The inventory app has the following routes for accessing all the different pages:
+1. Clone the repository to your local machine
+2. Install dependencies using npm install
+3. Start the server using `DEBUG=inventory-app:* npm run devstart`
+4. Navigate to http://localhost:3000 in your browser
 
-- The **home/index page** - `catalog/`
-- The **list of all games, game instances, genres, or studios** (e.g. `/catalog/games/`, `/catalog/genres/`, etc.) -
-`catalog/<objects>/` 
-- The **detail page** for a specific game, game instance, genre, or studio with the given _id field value .<br> 
-`catalog/<object>/<id>` 
-- The **form to create a new game, game instance, genre, or studio**.<br>
-`catalog/<object>/create` 
-- The **form to update a specific game, game instance, genre, or studio** with the given _id field value. <br>
-`catalog/<object>/<id>/update` 
-- The **form to delete a specific game, game instance, genre, studio** with the given _id field value. <br>
-`catalog/<object>/<id>/delete`
+# Usage
+
+Once the server is running, you can use the following endpoints to interact with the app:
+
+- GET /games: Returns a list of all games in the database
+- POST /game: Adds a new game to the database
+- GET /game/:id: Returns a specific game by ID
+- PUT /game/:id: Updates a specific game by ID
+- DELETE /game/:id: Deletes a specific game by ID
+
+Similar endpoints exist for studios, genres, and game instances.
+
+# Contributions
+If you find any issues or have suggestions for improvements, feel free to open an issue or submit a pull request. Contributions are always welcome!

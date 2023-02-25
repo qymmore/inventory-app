@@ -88,7 +88,7 @@ exports.game_detail = (req, res, next) => {
 
 // Display game create form on GET.
 exports.game_create_get = (req, res, next) => {
-  // Get all authors and genres, which we can use for adding to our book.
+  // Get all studios and genres, which we can use for adding to our game.
   async.parallel(
     {
       studios(callback) {
@@ -154,7 +154,7 @@ exports.game_create_post = [
     if (!errors.isEmpty()) {
       // There are errors. Render form again with sanitized values/error messages.
 
-      // Get all authors and genres for form.
+      // Get all studios and genres for form.
       async.parallel(
         {
           studios(callback) {
@@ -187,12 +187,12 @@ exports.game_create_post = [
       return;
     }
 
-    // Data from form is valid. Save book.
+    // Data from form is valid. Save game.
     game.save((err) => {
       if (err) {
         return next(err);
       }
-      // Successful: redirect to new book record.
+      // Successful: redirect to new game record.
       res.redirect(game.url);
     });
   },
@@ -261,14 +261,18 @@ exports.game_delete_post = function (req, res, next) {
         });
         return;
       } else {
-        // Book has no BookInstance objects. Delete object and redirect to the list of books.
-        Game.findByIdAndRemove(req.body.id, function deleteGame(err) {
-          if (err) {
-            return next(err);
-          }
-          // Success - got to books list.
-          res.redirect("/catalog/games");
-        });
+        // Game has no GameInstance objects. Delete object and redirect to the list of games.
+        if(req.body.password == process.env.SECRET_PASS){
+          Game.findByIdAndRemove(req.body.id, function deleteGame(err) {
+            if (err) {
+              return next(err);
+            }
+            // Success - got to books list.
+            res.redirect("/catalog/games");
+          });
+        } else {
+          res.send('Access denied');
+        }
       }
     }
   );
@@ -398,14 +402,18 @@ exports.game_update_post = [
     }
 
     // Data from form is valid. Update the record.
-    Game.findByIdAndUpdate(req.params.id, game, {}, (err, thegame) => {
-      if (err) {
-        return next(err);
-      }
-
-      // Successful: redirect to book detail page.
-      res.redirect(thegame.url);
-    });
+    if(req.body.password == process.env.SECRET_PASS){
+      Game.findByIdAndUpdate(req.params.id, game, {}, (err, thegame) => {
+        if (err) {
+          return next(err);
+        }
+  
+        // Successful: redirect to game detail page.
+        res.redirect(thegame.url);
+      });
+    } else {
+      res.send('Access denied');
+    }
   },
 ];
 

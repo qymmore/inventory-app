@@ -72,7 +72,7 @@ exports.gameinstance_create_post = [
     // Extract the validation errors from a request.
     const errors = validationResult(req);
 
-    // Create a BookInstance object with escaped and trimmed data.
+    // Create a GameInstance object with escaped and trimmed data.
     const gameinstance = new GameInstance({
       game: req.body.game,
       status: req.body.status,
@@ -136,13 +136,17 @@ exports.gameinstance_delete_get = function (req, res, next) {
 // Handle GameInstance delete on POST.
 exports.gameinstance_delete_post = function (req, res, next) {
   // Assume valid GameInstance id in field.
-  GameInstance.findByIdAndRemove(req.body.id, function deleteGameInstance(err) {
-    if (err) {
-      return next(err);
-    }
-    // Success, so redirect to list of GameInstance items.
-    res.redirect("/catalog/gameinstances");
-  });
+  if(req.body.password == process.env.SECRET_PASS){
+    GameInstance.findByIdAndRemove(req.body.id, function deleteGameInstance(err) {
+      if (err) {
+        return next(err);
+      }
+      // Success, so redirect to list of GameInstance items.
+      res.redirect("/catalog/gameinstances");
+    });
+  } else {
+    res.send('Access denied');
+  }
 };
 
 // Display GameInstance update form on GET.
@@ -216,18 +220,22 @@ exports.gameinstance_update_post = [
       return;
     } else {
       // Data from form is valid.
-      GameInstance.findByIdAndUpdate(
-        req.params.id,
-        gameinstance,
-        {},
-        function (err, thegameinstance) {
-          if (err) {
-            return next(err);
+      if(req.body.password == process.env.SECRET_PASS){
+        GameInstance.findByIdAndUpdate(
+          req.params.id,
+          gameinstance,
+          {},
+          function (err, thegameinstance) {
+            if (err) {
+              return next(err);
+            }
+            // Successful - redirect to detail page.
+            res.redirect(thegameinstance.url);
           }
-          // Successful - redirect to detail page.
-          res.redirect(thegameinstance.url);
-        }
-      );
+        );
+      } else {
+        res.send('Access denied');
+      }
     }
   },
 ];
